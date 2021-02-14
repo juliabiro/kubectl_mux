@@ -18,6 +18,20 @@ func getContexts() []string {
 	return strings.Fields(string(contexts))
 }
 
+var filters []string
+
+func applyFilters(contexts []string) (ret []string) {
+	fmt.Println(filters)
+	for _, f := range filters {
+		for _, c := range contexts {
+			if strings.Contains(c, f) {
+				ret = append(ret, c)
+			}
+		}
+	}
+	return ret
+}
+
 var rootCmd = &cobra.Command{
 	Use:   "kmux",
 	Short: "Runs the same command against multiple kubernetes clusters.",
@@ -25,8 +39,7 @@ var rootCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		// Do Stuff Here
 		contexts := getContexts()
-		fmt.Println(len(contexts))
-		fmt.Println(contexts)
+		fmt.Println(applyFilters(contexts))
 	},
 }
 
@@ -35,4 +48,8 @@ func Execute() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
+}
+
+func init() {
+	rootCmd.PersistentFlags().StringSliceVar(&filters, "filter", []string{}, "Strings by which to filter contexts")
 }
