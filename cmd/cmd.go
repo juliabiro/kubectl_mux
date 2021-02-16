@@ -21,7 +21,6 @@ func getContexts() []string {
 var filters []string
 
 func applyFilters(contexts []string) (ret []string) {
-	fmt.Println(filters)
 	for _, f := range filters {
 		for _, c := range contexts {
 			if strings.Contains(c, f) {
@@ -32,14 +31,36 @@ func applyFilters(contexts []string) (ret []string) {
 	return ret
 }
 
+func runCommand(args []string, context string, ch chan<- []string) {
+	arguments := append(args, "--context", context)
+	// yay passing an array as variadic parameter
+
+	ret, err := exec.Command("kubectl", arguments...).Output()
+	if err != nil {
+		fmt.Println("Couldn't run command.")
+		fmt.Printf("%s", err)
+	}
+	ch <- append([]string{context + "\n"}, string(ret))
+}
+
 var rootCmd = &cobra.Command{
 	Use:   "kmux",
 	Short: "Runs the same command against multiple kubernetes clusters.",
 	Long:  `Runs the same command against multiple kubernetes clusters.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		// Do Stuff Here
-		contexts := getContexts()
-		fmt.Println(applyFilters(contexts))
+		contexts := applyFilters(getContexts())
+
+		fmt.Println(contexts)
+
+		ch := make(chan []string, len(contexts))
+		for _, c := range contexts {
+			go runCommand(args, c, ch)
+		}
+
+		for _, _ = range contexts {
+			fmt.Println(<-ch)
+		}
 	},
 }
 
