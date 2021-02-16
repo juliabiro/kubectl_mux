@@ -34,3 +34,7 @@ $ kmux describe pods --filter 001 --filter 002
 ## Authentication
 
 The program doesn't do any authentication or setup, it simply executes the kubectl + the commands specified within the os. The `kubectl` command needs to be available where the binary is executed, and it needs to be able to authenticate (based on environmental variables or saved credentials).
+
+## TODO
+
+- support for kubectl flags (eg -n, -l, -A)
