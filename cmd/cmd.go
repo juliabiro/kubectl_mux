@@ -53,7 +53,7 @@ var rootCmd = &cobra.Command{
 
 		fmt.Println(contexts)
 
-		ch := make(chan []string)
+		ch := make(chan []string, len(contexts))
 		for _, c := range contexts {
 			go runCommand(args, c, ch)
 		}
