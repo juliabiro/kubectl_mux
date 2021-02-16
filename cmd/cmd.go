@@ -57,9 +57,8 @@ var rootCmd = &cobra.Command{
 		for _, c := range contexts {
 			go runCommand(args, c, ch)
 		}
-		<-ch
 
-		for {
+		for _, _ = range contexts {
 			fmt.Println(<-ch)
 		}
 	},
